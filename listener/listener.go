@@ -2,13 +2,12 @@ package listener
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net"
-	"os"
+	"bufio"
 )
 
-func start() {
+func StartListener() {
 	host := "localhost"
 	port := 1155
 	addr := fmt.Sprintf("%s:%d", host, port)
@@ -33,11 +32,25 @@ func start() {
 }
 
 func acceptClient(conn net.Conn) {
-	_, err := io.Copy(os.Stdout, conn)
+	fmt.Printf("Receiving connection from %s\n", conn.LocalAddr().String())
 	
-	if err != nil {
-		fmt.Println(err)
+	defer conn.Close()
+
+	for {
+		message, err := bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			fmt.Println(conn.RemoteAddr().String() + ": client disconnected")
+			return
+		}
+
+		if message == "bad word\n" {
+			fmt.Println("nooo")
+			if _, err := fmt.Fprintf(conn, "that's not cool\n"); err != nil {
+				fmt.Printf("Error sending back to client: %s\n", err)
+			}
+		}
+
+		fmt.Print(message)
 	}
 
-	conn.Close()
 }
