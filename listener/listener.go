@@ -48,7 +48,14 @@ func acceptClient(conn net.Conn) {
 		}
 
 		if strings.HasPrefix(message, "embsec{") {
-			response := talker.SubmitFlag(message)
+			resTemp := make(chan *talker.Response)
+			go talker.SubmitFlag(message, resTemp)
+			response := <- resTemp
+			// fmt.Println(response.Msg)
+
+			if _, err := fmt.Fprintf(conn, response.Msg); err != nil {
+				fmt.Printf("Error sending back to client: %s\n", err)
+			}
 
 		} else {
 			if _, err := fmt.Fprintf(conn, "Invalid Flag\n"); err != nil {
