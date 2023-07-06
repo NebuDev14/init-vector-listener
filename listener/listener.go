@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"bufio"
+	"strings"
+	"github.com/NebuDev14/init-vector-listener/talker"
 )
 
 func StartListener() {
@@ -36,6 +38,8 @@ func acceptClient(conn net.Conn) {
 	
 	defer conn.Close()
 
+	fmt.Fprintf(conn, "Connected to Initialization Vector Submission Platform\n")
+
 	for {
 		message, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
@@ -43,13 +47,16 @@ func acceptClient(conn net.Conn) {
 			return
 		}
 
-		if message == "bad word\n" {
-			fmt.Println("nooo")
-			if _, err := fmt.Fprintf(conn, "that's not cool\n"); err != nil {
+		if strings.HasPrefix(message, "embsec{") {
+			response := talker.SubmitFlag(message)
+
+		} else {
+			if _, err := fmt.Fprintf(conn, "Invalid Flag\n"); err != nil {
 				fmt.Printf("Error sending back to client: %s\n", err)
 			}
 		}
 
+	
 		fmt.Print(message)
 	}
 
