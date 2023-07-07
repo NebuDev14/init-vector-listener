@@ -35,7 +35,7 @@ func StartListener() {
 
 func acceptClient(conn net.Conn) {
 	fmt.Printf("Receiving connection from %s\n", conn.LocalAddr().String())
-	
+
 	defer conn.Close()
 
 	fmt.Fprintf(conn, "Connected to Initialization Vector Submission Platform\n")
@@ -51,7 +51,6 @@ func acceptClient(conn net.Conn) {
 			resTemp := make(chan *talker.Response)
 			go talker.SubmitFlag(message, resTemp)
 			response := <- resTemp
-			// fmt.Println(response.Msg)
 
 			if _, err := fmt.Fprintf(conn, response.Msg); err != nil {
 				fmt.Printf("Error sending back to client: %s\n", err)
@@ -63,7 +62,7 @@ func acceptClient(conn net.Conn) {
 			}
 		}
 
-	
+
 		fmt.Print(message)
 	}
 
