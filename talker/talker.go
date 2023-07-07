@@ -9,6 +9,8 @@ import (
 
 type Response struct {
 	Msg string `json:"Msg"`
+	Name string `json:"Name,omitempty"`
+	Link string `json:"Link,omitempty"`
 }
 
 func SubmitFlag(flag string, resTemp chan *Response) {

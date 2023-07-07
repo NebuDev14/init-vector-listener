@@ -11,6 +11,7 @@ import (
 )
 
 func StartListener() {
+
 	host := "localhost"
 	port := 1155
 	addr := fmt.Sprintf("%s:%d", host, port)
@@ -35,13 +36,13 @@ func StartListener() {
 }
 
 func acceptClient(conn net.Conn) {
+	yellowWriter := color.New(color.FgYellow).FprintFunc()
+	redWriter := color.New(color.FgRed).FprintFunc()
+
 	fmt.Printf("Receiving connection from %s\n", conn.LocalAddr().String())
 
 	defer conn.Close()
 
-	yellowWriter := color.New(color.FgYellow).FprintFunc()
-	redWriter := color.New(color.FgRed).FprintFunc()
-	greenWriter := color.New(color.FgGreen).FprintFunc()
 	yellowWriter(conn, "Connected to Initialization Vector Submission Platform\n")
 	yellowWriter(conn, "Type in a flag string to submit..\n")
 
@@ -57,17 +58,27 @@ func acceptClient(conn net.Conn) {
 			go talker.SubmitFlag(message, resTemp)
 			response := <-resTemp
 
-			if strings.HasPrefix(response.Msg, "Invalid") {
-				redWriter(conn, response.Msg)
+			if response.Msg == "Success" {
+				formatColorPrint(response, conn)
 			} else {
-				greenWriter(conn, response.Msg)
+				redWriter(conn, "Invalid Flag\n")
 			}
 
 		} else {
 			redWriter(conn, "Invalid Flag\n")
 		}
-
-		fmt.Print(message)
 	}
 
+}
+
+func formatColorPrint(res *talker.Response, conn net.Conn) {
+	greenWriter := color.New(color.FgGreen).FprintFunc()
+	name := color.New(color.FgGreen, color.Bold).FprintFunc()
+	link := color.New(color.FgGreen, color.Underline).FprintFunc()
+
+	greenWriter(conn, "Valid flag for ")
+	name(conn, res.Name)
+	greenWriter(conn, ".\nSubmission Link: ")
+	link(conn, res.Link)
+	greenWriter(conn, "\n")
 }
