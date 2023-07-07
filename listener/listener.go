@@ -1,12 +1,13 @@
 package listener
 
 import (
+	"bufio"
 	"fmt"
+	"github.com/NebuDev14/init-vector-listener/talker"
+	"github.com/fatih/color"
 	"log"
 	"net"
-	"bufio"
 	"strings"
-	"github.com/NebuDev14/init-vector-listener/talker"
 )
 
 func StartListener() {
@@ -38,7 +39,11 @@ func acceptClient(conn net.Conn) {
 
 	defer conn.Close()
 
-	fmt.Fprintf(conn, "Connected to Initialization Vector Submission Platform\n")
+	yellowWriter := color.New(color.FgYellow).FprintFunc()
+	redWriter := color.New(color.FgRed).FprintFunc()
+	greenWriter := color.New(color.FgGreen).FprintFunc()
+	yellowWriter(conn, "Connected to Initialization Vector Submission Platform\n")
+	yellowWriter(conn, "Type in a flag string to submit..\n")
 
 	for {
 		message, err := bufio.NewReader(conn).ReadString('\n')
@@ -50,18 +55,17 @@ func acceptClient(conn net.Conn) {
 		if strings.HasPrefix(message, "embsec{") {
 			resTemp := make(chan *talker.Response)
 			go talker.SubmitFlag(message, resTemp)
-			response := <- resTemp
+			response := <-resTemp
 
-			if _, err := fmt.Fprintf(conn, response.Msg); err != nil {
-				fmt.Printf("Error sending back to client: %s\n", err)
+			if strings.HasPrefix(response.Msg, "Invalid") {
+				redWriter(conn, response.Msg)
+			} else {
+				greenWriter(conn, response.Msg)
 			}
 
 		} else {
-			if _, err := fmt.Fprintf(conn, "Invalid Flag\n"); err != nil {
-				fmt.Printf("Error sending back to client: %s\n", err)
-			}
+			redWriter(conn, "Invalid Flag\n")
 		}
-
 
 		fmt.Print(message)
 	}
