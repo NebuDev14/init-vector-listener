@@ -12,11 +12,8 @@ import (
 
 func StartListener() {
 
-	host := "localhost"
-	port := 1155
-	addr := fmt.Sprintf("%s:%d", host, port)
-
-	listener, err := net.Listen("tcp", addr)
+	port := 5000
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 
 	if err != nil {
 		panic(err)
