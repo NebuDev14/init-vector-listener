@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+/* Begins listening for submissions via TCP */
 func StartListener() {
 
 	port := 5000
@@ -32,6 +33,7 @@ func StartListener() {
 
 }
 
+/* Establishes communication with incoming clients */
 func acceptClient(conn net.Conn) {
 	yellowWriter := color.New(color.FgYellow).FprintFunc()
 	redWriter := color.New(color.FgRed).FprintFunc()
@@ -68,6 +70,7 @@ func acceptClient(conn net.Conn) {
 
 }
 
+/* Writes to terminal with pretty colors */
 func formatColorPrint(res *talker.Response, conn net.Conn) {
 	greenWriter := color.New(color.FgGreen).FprintFunc()
 	name := color.New(color.FgGreen, color.Bold).FprintFunc()

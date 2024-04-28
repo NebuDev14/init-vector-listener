@@ -7,14 +7,16 @@ import (
 	"net/http"
 )
 
+/* Struct representing a response from the listener. */
 type Response struct {
-	Msg string `json:"Msg"`
-	Name string `json:"Name,omitempty"`
-	Link string `json:"Link,omitempty"`
+	Msg string `json:"Msg"` // The status message
+	Name string `json:"Name,omitempty"` // The name of the challenge
+	Link string `json:"Link,omitempty"` // The submission link if the challenge is completed
 }
 
+/* Sends a request to the submission website */
 func SubmitFlag(flag string, resTemp chan *Response) {
-	url := "http://localhost:3000/api/listener/submit"
+	url := "http://bwsi-lab-submission.vercel.app/api/listener/submit"
 
 	rawBody := map[string]string{"flag": flag}
 	body, err := json.Marshal(rawBody)
